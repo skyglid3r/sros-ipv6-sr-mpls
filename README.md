@@ -7,16 +7,8 @@
 
 ## Physical topology
 
-```text
-Client1                            P1                             Client2
-   |                            / /  \ \                            |
- VLAN101                    PE1 /      \ PE3                     VLAN201
-   |                        |          |                           |
-  CE1 === IPv6 eBGP ====== PE1/PE2   PE3/PE4 ===== IPv6 eBGP === CE2
-                              \ \  / /                               
-                                P2
-[Lab Topology](ipv6-dualh.png)
-```
+![Lab Topology](ipv6-dualh.png)
+
 
 ## IP addressing and routing
 
