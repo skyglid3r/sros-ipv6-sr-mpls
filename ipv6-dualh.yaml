@@ -1,0 +1,118 @@
+name: ipv6-dualh
+prefix: ""  
+topology:
+  kinds:
+    nokia_srsim:
+      image: localhost/nokia/srsim:25.7.R1
+      license: license.txt
+    linux:
+      image: ghcr.io/mfzhsn/network-multitool-sshd:0.0.5
+  nodes:
+    client1:
+      kind: linux
+      image: ghcr.io/mfzhsn/network-multitool-sshd:0.0.5
+      exec:
+      - ip link set dev eth1 up
+      - ip link add link eth1 name eth1.101 type vlan id 101
+      - ip link set dev eth1.101 up
+      - ip -6 address add 2001:db8:101::10/64 dev eth1.101
+      - ip -6 route replace default via 2001:db8:101::1 dev eth1.101
+    ce1:
+      kind: nokia_srsim
+      type: sr-1se
+      components: &id001
+      - slot: A
+        type: cpm-1se
+      - slot: 1
+        type: imm36-800g-qsfpdd
+        mda:
+        - slot: 1
+          type: ms36-800g-qsfpdd
+      startup-config: configs/ce1.partial.cfg
+    pe1:
+      kind: nokia_srsim
+      type: sr-1se
+      components: *id001
+      startup-config: configs/pe1.partial.cfg
+    pe2:
+      kind: nokia_srsim
+      type: sr-1se
+      components: *id001
+      startup-config: configs/pe2.partial.cfg
+    p1:
+      kind: nokia_srsim
+      type: sr-1se
+      components: *id001
+      startup-config: configs/p1.partial.cfg
+    p2:
+      kind: nokia_srsim
+      type: sr-1se
+      components: *id001
+      startup-config: configs/p2.partial.cfg
+    pe3:
+      kind: nokia_srsim
+      type: sr-1se
+      components: *id001
+      startup-config: configs/pe3.partial.cfg
+    pe4:
+      kind: nokia_srsim
+      type: sr-1se
+      components: *id001
+      startup-config: configs/pe4.partial.cfg
+    ce2:
+      kind: nokia_srsim
+      type: sr-1se
+      components: *id001
+      startup-config: configs/ce2.partial.cfg
+    client2:
+      kind: linux
+      image: ghcr.io/mfzhsn/network-multitool-sshd:0.0.5
+      exec:
+      - ip link set dev eth1 up
+      - ip link add link eth1 name eth1.201 type vlan id 201
+      - ip link set dev eth1.201 up
+      - ip -6 address add 2001:db8:201::10/64 dev eth1.201
+      - ip -6 route replace default via 2001:db8:201::1 dev eth1.201
+  links:
+  - endpoints:
+    - pe1:1/1/c2/1
+    - p1:1/1/c1/1
+  - endpoints:
+    - pe1:1/1/c3/1
+    - p2:1/1/c1/1
+  - endpoints:
+    - pe2:1/1/c2/1
+    - p1:1/1/c2/1
+  - endpoints:
+    - pe2:1/1/c3/1
+    - p2:1/1/c2/1
+  - endpoints:
+    - p1:1/1/c3/1
+    - pe3:1/1/c2/1
+  - endpoints:
+    - p2:1/1/c3/1
+    - pe3:1/1/c3/1
+  - endpoints:
+    - p1:1/1/c4/1
+    - pe4:1/1/c2/1
+  - endpoints:
+    - p2:1/1/c4/1
+    - pe4:1/1/c3/1
+  - endpoints:
+    - ce1:1/1/c1/1
+    - pe1:1/1/c1/1
+  - endpoints:
+    - ce1:1/1/c3/1
+    - pe2:1/1/c1/1
+  - endpoints:
+    - ce2:1/1/c4/1
+    - pe3:1/1/c1/1
+  - endpoints:
+    - ce2:1/1/c1/1
+    - pe4:1/1/c1/1
+  - endpoints:
+    - client1:eth1
+    - ce1:1/1/c2/1
+  - endpoints:
+    - client2:eth1
+    - ce2:1/1/c3/1
